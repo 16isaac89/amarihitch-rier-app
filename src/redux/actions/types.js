@@ -24,3 +24,7 @@ export const GET_NEW_ORDERS = 'get_new_orders'
 export const GET_ACTIVE_ORDERS = 'get_active_orders'
 export const GET_COMPLETED_ORDERS = 'get_completed_orders'
 export const SHOW_ORDER = 'show_order'
+export const CLOSE_ORDER_DIALOG = 'close_order_dialog'
+export const ORDER_COMPLETED = 'order_completed'
+
+export const WALLET_BALANCE = 'wallet_balance'

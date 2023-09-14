@@ -13,7 +13,8 @@ import {
     SET_APP_STATE,
    C_PASSWORD_CHANGED,
    SECOND_NAME,
-   TOKEN_SENT
+   TOKEN_SENT,
+   WALLET_BALANCE
  } from '../actions/types';
  import axios from "axios"
  import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -180,6 +181,35 @@ export const sendfcmtoken=() =>{
               .then( async(response)  => {
                 console.log(response)
                  dispatch({type:TOKEN_SENT})
+                
+              })
+              .catch(function (error) {
+               console.log(error.response) 
+                dispatch({type:AUTHLOADER_OFF})
+              })
+        }
+    } 
+  }
+
+  export const walletbalance=() =>{
+    
+    // Register the device with FCM
+    return async(dispatch)=>{
+        dispatch({type:AUTH_LOADER})
+        await messaging().registerDeviceForRemoteMessages();
+        const token = await messaging().getToken();
+        let userdata = await AsyncStorage.getItem('userdata');
+        if(userdata){
+         let user = JSON.parse(userdata)
+         axios.post(ROOT_URL+"/driver/wallet/balance", {
+            id:user.id,
+          })
+              .then( async(response)  => {
+                let balance = response.data.balance
+                let driverpercentage = response.data.driverpercentage/100
+                let transactions = response.data.orders
+                console.log(transactions,driverpercentage,balance)
+                 dispatch({type:WALLET_BALANCE,payload:{balance,driverpercentage,transactions}})
                 
               })
               .catch(function (error) {

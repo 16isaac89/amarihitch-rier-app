@@ -1,66 +1,32 @@
-import React from "react";
-import { SafeAreaView, StatusBar, StyleSheet, View, Text, FlatList } from "react-native";
+import React,{Component} from "react";
+import { SafeAreaView, StatusBar, StyleSheet, View, Text, FlatList,ActivityIndicator } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constant/styles";
 import  MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { connect } from 'react-redux';
+import * as actions from '../../redux/actions';
 
-const earningList = [
-    {
-        id: '1',
-        earningAmount: 3.50,
-    },
-    {
-        id: '2',
-        earningAmount: 5.70,
-    },
-    {
-        id: '3',
-        earningAmount: 3.90,
-    },
-    {
-        id: '4',
-        earningAmount: 8.75,
-    },
-    {
-        id: '5',
-        earningAmount: 9.0,
-    },
-    {
-        id: '6',
-        earningAmount: 7.30,
-    },
-    {
-        id: '7',
-        earningAmount: 5.10,
-    },
-    {
-        id: '8',
-        earningAmount: 7.50,
-    },
-    {
-        id: '9',
-        earningAmount: 8.50,
-    },
-    {
-        id: '10',
-        earningAmount: 10.0,
-    },
-];
 
-const WalletScreen = ({ navigation }) => {
+class WalletScreen extends Component {
 
-    const renderItem = ({ item }) => {
+
+async componentDidMount(){
+await this.props.walletbalance()
+}
+
+
+    renderItem = ({ item }) => {
         return (
             <View style={styles.earningListItemWrapStyle}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <MaterialIcons name="fastfood" size={29} color={Colors.primaryColor} />
+                    {/* <MaterialIcons name="fastfood" size={29} color={Colors.primaryColor} /> */}
                     <Text style={{ ...Fonts.blackColor18Medium, marginLeft: Sizes.fixPadding }}>
-                        Food Delivered
+                        Delivery
                     </Text>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                     <Text style={{ ...Fonts.grayColor18Medium }}>
-                        {item.earningAmount.toFixed(2)}
+                        {item.money*this.props.percentageshare}
                     </Text>
                     <Text style={{ ...Fonts.darkPinkColor16Medium, }}>
                         Earning
@@ -69,36 +35,44 @@ const WalletScreen = ({ navigation }) => {
             </View>
         )
     }
-
+render(){
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <StatusBar />
             <View style={{ flex: 1 }}>
-                {earningInfo()}
+                {this.props.loader === true ? 	<ActivityIndicator size="large" color="#00ff00" /> : this.earningInfo()}
+                {this.props.loader === true && 	<ActivityIndicator size="large" color="#00ff00" />}
                 <View style={styles.earningListWrapStyle}>
+                {this.props.transactions.length > 0 ?
                     <FlatList
-                        data={earningList}
+                        data={this.props.transactions}
                         keyExtractor={(item) => `${item.id}`}
-                        renderItem={renderItem}
+                        renderItem={this.renderItem}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{
                             paddingTop: Sizes.fixPadding * 2.0,
                             paddingBottom: Sizes.fixPadding * 17.0
                         }}
                     />
+                    :
+                    <Text style={{ ...Fonts.grayColor17Medium, marginTop: Sizes.fixPadding }}>
+                    You havent completed any orders.
+                </Text>
+                    }
                 </View>
             </View>
         </SafeAreaView>
     )
+                    }
 
-    function earningInfo() {
+    earningInfo=() =>{
         return (
             <View style={styles.totalEarningInfoWrapStyle}>
                 <Text style={{ ...Fonts.whiteColor25Medium }}>
                     Earning
                 </Text>
                 <Text style={{ ...Fonts.whiteColor25Medium, paddingTop: Sizes.fixPadding - 3.0 }}>
-                    $190.8
+                    UGX {this.props.balance}
                 </Text>
             </View>
         )
@@ -132,4 +106,14 @@ const styles = StyleSheet.create({
     }
 })
 
-export default WalletScreen;
+
+function mapStateToProps( state ) {
+    return { 
+        balance:state.auth.walletbalance,
+   transactions:state.auth.transactions,
+   percentageshare:state.auth.percentageshare,
+        loader:state.auth.regloader
+    };
+  }
+  
+  export default connect(mapStateToProps, actions)(WalletScreen);

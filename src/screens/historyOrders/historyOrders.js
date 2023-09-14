@@ -1,88 +1,149 @@
-import React from "react";
-import { View, Text, StyleSheet, FlatList, Image } from "react-native";
+import React, { Component, useState } from "react";
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView, Dimensions,Linking } from "react-native";
 import { Colors, Sizes, Fonts } from "../../constant/styles";
 import  MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Dialog from "react-native-dialog";
+import { connect } from 'react-redux';
+import * as actions from '../../redux/actions';
 
-const historyOrdersList = [
-    {
-        id: '1',
-        orderId: 'OID123456789',
-        paymentMethod: 'Cash on Delivery',
-        payableAmount: 8.50,
-        pickupAddress: '28 Mott Stret',
-        deliveryAddress: '56 Andheri East'
-    },
-    {
-        id: '2',
-        orderId: 'OID123789654',
-        paymentMethod: 'Payed',
-        payableAmount: 12.50,
-        pickupAddress: '91 Opera Street',
-        deliveryAddress: '231 Abc Circle'
-    },
-    {
-        id: '3',
-        orderId: 'OID957546521',
-        paymentMethod: 'Pated',
-        payableAmount: 15.00,
-        pickupAddress: '28 Mott Stret',
-        deliveryAddress: '91 Yogi Circle'
-    },
-    {
-        id: '4',
-        orderId: 'OID652347952',
-        paymentMethod: 'Cash on Delivery',
-        payableAmount: 7.90,
-        pickupAddress: '28 Mott Stret',
-        deliveryAddress: '56 Andheri East'
-    }
-];
+const { width, height } = Dimensions.get('screen');
 
-const HistoryOrders = () => {
+
+class historyOrders extends Component {
+
+
+async componentDidMount(){
+    await this.props.historyorders()
+}
+completeorder = (item) =>{
+console.log(item)
+}
+   
+render(){
     return (
+        this.props.orders.length == 0
+            ?
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F4F4' }}>
+                <MaterialCommunityIcons name="shopping" size={60}
+                    color={Colors.grayColor}
+                />
+                <Text style={{ ...Fonts.grayColor17Medium, marginTop: Sizes.fixPadding }}>
+                    No Completed orders.
+                </Text>
+            </View>
+            :
         <View style={{ flex: 1, backgroundColor: '#F4F4F4' }}>
-            {orders()}
+            {this.orders()}
+            {this.activeDialog()}
         </View>
     )
+}
 
-    function orders() {
+     activeDialog=()=> {
+        return (
+            <Dialog.Container visible={this.props.showorder}
+                contentStyle={styles.dialogContainerStyle}
+                headerStyle={{ margin: 0.0, padding: 0.0, }}
+            >
+                <View style={{
+                    backgroundColor: 'white',
+                    height: height - 150,
+                    borderRadius: Sizes.fixPadding
+                }}>
+                    {this.orderId()}
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {this.orderDetail()}
+                      
+                        {this.startButton()}
+
+                    </ScrollView>
+
+                </View>
+            </Dialog.Container>
+        )
+    }
+
+   startButton=() =>{
+        return (
+            <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => {
+                    this.props.closeorderdialog()
+                    //this.props.navigation.navigate('ShowMap')
+                }}
+                style={styles.startButtonStyle}>
+                <Text style={{ ...Fonts.whiteColor18Medium }}>
+            Close
+                </Text>
+            </TouchableOpacity>
+        )
+    }
+
+ 
+
+   orderDetail=()=> {
+        return (
+            <View style={styles.detailWrapStyle}>
+                <View style={styles.detailHeaderWrapStyle}>
+                    <Text style={{ ...Fonts.blackColor17Medium }}>
+                        Order Details
+                    </Text>
+                </View>
+                <View style={styles.detailDescriptionWrapStyle}>
+                    <View style={styles.detailSpecificWrapStyle}>
+                        <Text style={{ ...Fonts.blackColor15Medium }}>
+                            {this.props.activeorder.details}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        )
+    }
+
+   orderId=()=> {
+        return (
+            <View style={styles.detailTitleWrapStyle}>
+                <Text style={{ ...Fonts.whiteColor17Regular }}>
+                    {this.props.activeorder.id}
+                </Text>
+            </View>
+        )
+    }
+
+    orders=()=> {
 
         const renderItem = ({ item }) => (
-            <View style={styles.orderDetailWrapStyle}>
+            <View
+                activeOpacity={0.9}
+               
+                style={styles.orderDetailWrapStyle}>
                 <View style={styles.orderAndPaymentDetailWrapStyle}>
                     <View style={{ flexDirection: 'row' }}>
-                        <MaterialIcons name="fastfood" size={29} color={Colors.primaryColor} />
+                        {/* <MaterialIcons name="fastfood" size={29} color={Colors.primaryColor} /> */}
                         <View style={{ marginLeft: Sizes.fixPadding }}>
                             <Text style={{ ...Fonts.blackColor18Medium }}>
                                 {item.orderId}
                             </Text>
-                            <View style={{ marginTop: Sizes.fixPadding + 10.0 }}>
-                                <Text style={{ ...Fonts.grayColor16Medium }}>
-                                    Payment Mode
-                                </Text>
-                                <Text style={{ ...Fonts.blackColor18Medium }}>
-                                    {item.paymentMethod}
-                                </Text>
+                            <View style={{ marginTop: Sizes.fixPadding + 2.0,flexDirection:'row' }}>
+                        
+
+                           
                             </View>
                         </View>
                     </View>
 
-                    <View>
-                        <View style={styles.deliveredButtonStyle}>
-                            <Text style={{ ...Fonts.whiteColor18Medium }}>
-                                Delivered
-                            </Text>
-                        </View>
-                        <View style={{ marginTop: Sizes.fixPadding, marginBottom: Sizes.fixPadding - 9.0 }}>
-                            <Text style={{ ...Fonts.grayColor16Medium }}>
-                                Payment
-                            </Text>
-                            <Text style={{ ...Fonts.blackColor18Medium }}>
-                                {`$ ${item.payableAmount.toFixed(2)}`}
-                            </Text>
-                        </View>
+                    <View style={{ marginBottom: Sizes.fixPadding - 9.0,right:'60%' }}>
+                        <Text style={{ ...Fonts.grayColor16Medium }}>
+                           Del OTP: {item.del_otp}
+                        </Text>
+                        {/* <Text style={{ ...Fonts.blackColor18Medium }}>
+                            {`$ ${item.money}`}
+                        </Text> */}
                     </View>
+
                 </View>
 
                 <View style={styles.deliveryAndPickupAddressWrapStyle}>
@@ -90,7 +151,7 @@ const HistoryOrders = () => {
                         ...Fonts.blackColor16Medium,
                         flex: 0.31,
                     }}>
-                        {item.pickupAddress}
+                        {item.from}
                     </Text>
                     <View style={{
                         flexDirection: 'row',
@@ -109,15 +170,19 @@ const HistoryOrders = () => {
                             resizeMode="cover"
                         />
                     </View>
-                    <Text style={{ ...Fonts.blackColor16Medium, flex: 0.31, }}>
-                        {item.deliveryAddress}
+                    <Text style={{
+                        ...Fonts.blackColor16Medium,
+                        flex: 0.31,
+                    }}>
+                        {item.to}
                     </Text>
                 </View>
             </View>
         )
+
         return (
             <FlatList
-                data={historyOrdersList}
+                data={this.props.orders}
                 keyExtractor={(item) => `${item.id}`}
                 renderItem={renderItem}
                 showsVerticalScrollIndicator={false}
@@ -131,17 +196,15 @@ const HistoryOrders = () => {
 }
 
 const styles = StyleSheet.create({
+    buttons:{
+        margin:15,
+
+    },
     dotStyle: {
         height: 5.0, width: 5.0,
         borderRadius: 2.5,
         backgroundColor: Colors.primaryColor,
         marginHorizontal: Sizes.fixPadding - 7.0
-    },
-    deliveredButtonStyle: {
-        backgroundColor: Colors.primaryColor,
-        borderRadius: Sizes.fixPadding - 5.0,
-        paddingHorizontal: Sizes.fixPadding * 2.0,
-        paddingVertical: Sizes.fixPadding,
     },
     deliveryAndPickupAddressWrapStyle: {
         backgroundColor: Colors.lightGrayColor,
@@ -163,7 +226,66 @@ const styles = StyleSheet.create({
         borderRadius: Sizes.fixPadding - 5.0,
         marginHorizontal: Sizes.fixPadding,
         marginBottom: Sizes.fixPadding * 2.0,
+    },
+    dialogContainerStyle: {
+        borderRadius: Sizes.fixPadding,
+        width: width - 70,
+        alignSelf: 'center',
+        margin: 0, padding: 0
+    },
+    detailWrapStyle: {
+        marginHorizontal: Sizes.fixPadding,
+        borderRadius: Sizes.fixPadding,
+        backgroundColor: Colors.whiteColor,
+        marginVertical: Sizes.fixPadding,
+    },
+    detailHeaderWrapStyle: {
+        backgroundColor: Colors.lightGrayColor,
+        paddingVertical: Sizes.fixPadding - 2.0,
+        alignItems: 'center',
+        borderTopLeftRadius: Sizes.fixPadding - 5.0,
+        borderTopRightRadius: Sizes.fixPadding - 5.0
+    },
+    detailDescriptionWrapStyle: {
+        backgroundColor: Colors.whiteColor,
+        borderColor: '#F6F6F6',
+        borderWidth: 1.0,
+        elevation: 0.70,
+        padding: Sizes.fixPadding,
+        borderBottomLeftRadius: Sizes.fixPadding - 5.0,
+        borderBottomRightRadius: Sizes.fixPadding - 5.0,
+    },
+    detailSpecificWrapStyle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: Sizes.fixPadding - 5.0
+    },
+    detailTitleWrapStyle: {
+        backgroundColor: Colors.primaryColor,
+        paddingVertical: Sizes.fixPadding,
+        alignItems: 'center',
+        borderTopLeftRadius: Sizes.fixPadding,
+        borderTopRightRadius: Sizes.fixPadding,
+    },
+    startButtonStyle: {
+        backgroundColor: Colors.primaryColor,
+        paddingVertical: Sizes.fixPadding - 2.0,
+        alignItems: 'center',
+        marginHorizontal: Sizes.fixPadding,
+        borderRadius: Sizes.fixPadding - 5.0,
+        marginVertical: Sizes.fixPadding,
     }
 })
 
-export default HistoryOrders;
+function mapStateToProps( state ) {
+    return { 
+        orders:state.order.completedorders || [],
+        showorder:state.order.showorder,
+        activeorder:state.order.activeorder,
+        loader:state.order.loader,
+        orderdetails:state.order.orderdetails
+    };
+  }
+  
+  export default connect(mapStateToProps, actions)(historyOrders);

@@ -76,7 +76,7 @@ render(){
                             }}
                             style={styles.acceptButtonStyle}>
                             <Text style={{ ...Fonts.whiteColor18Medium }}>
-                                Accept
+                                Details
                             </Text>
                         </TouchableOpacity>
                         {/* <View style={{ marginTop: Sizes.fixPadding, marginBottom: Sizes.fixPadding - 9.0 }}>
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
 
 function mapStateToProps( state ) {
     return { 
-        orders:state.order.neworders,
+        orders:state.order.neworders || [],
         showorder:state.order.showorder,
         activeorder:state.order.activeorder,
         loader:state.order.loader

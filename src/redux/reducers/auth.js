@@ -15,6 +15,7 @@ import {
     SET_COUNTRY_CODE,
     C_PASSWORD_CHANGED,
     SET_APP_STATE,
+    WALLET_BALANCE
  } from '../actions/types';
  
  const INITIAL_STATE = {
@@ -34,7 +35,10 @@ import {
    newversion:"0.1",
    appvermodal:false,
    phonenumbercode:'+256',
-   secondname:''
+   secondname:'',
+   walletbalance:0,
+   transactions:[],
+   percentageshare:0
  };
  
  export default function(state = INITIAL_STATE, action) {
@@ -67,6 +71,9 @@ import {
       return{...state,appstate:action.payload}
     case SECOND_NAME:
       return{...state,secondname:action.payload}
+    case WALLET_BALANCE:
+      return{...state,walletbalance:action.payload.balance,transactions:action.payload.transactions,
+        percentageshare:action.payload.driverpercentage,regloader:false}
      default:
        return state;
    }

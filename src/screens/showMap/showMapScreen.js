@@ -1,43 +1,36 @@
-import React, { useState } from "react";
+import React, { Component } from "react";
 import { SafeAreaView, StatusBar, StyleSheet, View, Text, ScrollView, Image, Dimensions, TouchableOpacity } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constant/styles";
 import  MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dialog from "react-native-dialog";
 import MapView, { Marker } from "react-native-maps";
+import { connect } from 'react-redux';
+import * as actions from '../../redux/actions';
 
 const { width, height } = Dimensions.get('screen');
 
-const ShowMapScreen = ({ navigation }) => {
+class ShowMapScreen extends Component {
 
-    const [state, setState] = useState({
-        showDialog: false,
-        orderCompleted: false,
-    })
-
-    const updateState = (data) => setState((state) => ({ ...state, ...data }))
-
-    const {
-        showDialog,
-        orderCompleted,
-    } = state;
-
+    
+render(){
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
             <View style={{ flex: 1, }}>
-                {header()}
-                {mapInfo()}
+                {this.header()}
+                {this.mapInfo()}
             </View>
-            {listIcon()}
-            {phoneIcon()}
-            {userInfo()}
-            {detailDiolog()}
-            {orderCompletedDialog()}
+            {this.listIcon()}
+            {this.phoneIcon()}
+            {this.userInfo()}
+            {this.detailDiolog()}
+            {this.orderCompletedDialog()}
         </SafeAreaView>
     )
+}
 
-    function mapInfo() {
+     mapInfo=()=> {
         return (
             <MapView
                 style={{
@@ -64,7 +57,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function orderCompletedDialog() {
+    orderCompletedDialog=()=> {
         return (
             <Dialog.Container visible={orderCompleted}
                 contentStyle={styles.orderCompletedDialogStyle}
@@ -86,7 +79,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function detailDiolog() {
+    detailDiolog=()=> {
         return (
             <Dialog.Container visible={showDialog}
                 contentStyle={styles.dialogContainerStyle}
@@ -97,22 +90,22 @@ const ShowMapScreen = ({ navigation }) => {
                     height: height - 150,
                     borderRadius: Sizes.fixPadding
                 }}>
-                    {orderId()}
+                    {this.orderId()}
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                     >
-                        {orderDetail()}
-                        {locationDetail()}
-                        {customerDetail()}
-                        {paymentDetail()}
-                        {okButton()}
+                        {this.orderDetail()}
+                        {this.locationDetail()}
+                        {this.customerDetail()}
+                        {this.paymentDetail()}
+                        {this.okButton()}
                     </ScrollView>
                 </View>
             </Dialog.Container>
         )
     }
 
-    function okButton() {
+okButton=()=> {
         return (
             <TouchableOpacity
                 activeOpacity={0.9}
@@ -126,7 +119,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function paymentDetail() {
+    paymentDetail=()=> {
         return (
             <View style={styles.detailWrapStyle}>
                 <View style={styles.detailHeaderWrapStyle}>
@@ -148,7 +141,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function customerDetail() {
+   customerDetail=()=> {
         return (
             <View style={styles.detailWrapStyle}>
                 <View style={styles.detailHeaderWrapStyle}>
@@ -178,7 +171,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function locationDetail() {
+  locationDetail=()=> {
         return (
             <View style={styles.detailWrapStyle}>
                 <View style={styles.detailHeaderWrapStyle}>
@@ -208,7 +201,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function orderDetail() {
+orderDetail=()=> {
         return (
             <View style={styles.detailWrapStyle}>
                 <View style={styles.detailHeaderWrapStyle}>
@@ -262,7 +255,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function orderId() {
+  orderId=() =>{
         return (
             <View style={styles.detailTitleWrapStyle}>
                 <Text style={{ ...Fonts.whiteColor17Regular }}>
@@ -272,7 +265,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function listIcon() {
+   listIcon=() =>{
         return (
             <TouchableOpacity
                 activeOpacity={0.9}
@@ -286,7 +279,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function phoneIcon() {
+  phoneIcon=()=> {
         return (
             <View style={{
                 bottom: 170.0,
@@ -297,7 +290,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function header() {
+   header=()=> {
         return (
             <View style={styles.headerWrapStyle}>
                 <Text style={{ ...Fonts.blackColor19Bold }}>
@@ -314,7 +307,7 @@ const ShowMapScreen = ({ navigation }) => {
         )
     }
 
-    function userInfo() {
+userInfo=() =>{
         return (
             <View style={styles.userInfoWrapStyle}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: Sizes.fixPadding }}>
@@ -463,4 +456,14 @@ const styles = StyleSheet.create({
     }
 });
 
-export default ShowMapScreen;
+
+function mapStateToProps( state ) {
+    return { 
+        orders:state.order.activeorders || [],
+        showorder:state.order.showorder,
+        activeorder:state.order.activeorder,
+        loader:state.order.loader
+    };
+  }
+  
+  export default connect(mapStateToProps, actions)(ShowMapScreen);

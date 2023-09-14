@@ -1,61 +1,50 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView, Dimensions } from "react-native";
+import React, { Component, useState } from "react";
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView, Dimensions,Linking,ActivityIndicator } from "react-native";
 import { Colors, Sizes, Fonts } from "../../constant/styles";
 import  MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dialog from "react-native-dialog";
+import { connect } from 'react-redux';
+import * as actions from '../../redux/actions';
 
 const { width, height } = Dimensions.get('screen');
 
-const activeOrdersList = [
-    {
-        id: '1',
-        orderId: 'OID123456789',
-        paymentMethod: 'Cash on Delivery',
-        payableAmount: 8.50,
-        pickupAddress: '28 Mott Stret',
-        deliveryAddress: '56 Andheri East'
-    },
-    {
-        id: '2',
-        orderId: 'OID123789654',
-        paymentMethod: 'Payed',
-        payableAmount: 12.50,
-        pickupAddress: '91 Opera Street',
-        deliveryAddress: '231 Abc Circle'
-    },
-    {
-        id: '3',
-        orderId: 'OID957546521',
-        paymentMethod: 'Pated',
-        payableAmount: 15.00,
-        pickupAddress: '28 Mott Stret',
-        deliveryAddress: '91 Yogi Circle'
-    },
-    {
-        id: '4',
-        orderId: 'OID652347952',
-        paymentMethod: 'Cash on Delivery',
-        payableAmount: 7.90,
-        pickupAddress: '28 Mott Stret',
-        deliveryAddress: '56 Andheri East'
-    }
-];
 
-const ActiveOrders = ({ navigation }) => {
+class ActiveOrders extends Component {
 
-    const [showActiveDialog, setShowActiveDialog] = useState(false);
 
+async componentDidMount(){
+    await this.props.activeorders()
+}
+completeorder = (item) =>{
+    let order = item.id
+    this.props.completeorder(order)
+//console.log(item)
+}
+   
+render(){
     return (
+        this.props.orders.length == 0
+            ?
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F4F4' }}>
+                <MaterialCommunityIcons name="shopping" size={60}
+                    color={Colors.grayColor}
+                />
+                <Text style={{ ...Fonts.grayColor17Medium, marginTop: Sizes.fixPadding }}>
+                    No Active orders.
+                </Text>
+            </View>
+            :
         <View style={{ flex: 1, backgroundColor: '#F4F4F4' }}>
-            {orders()}
-            {activeDialog()}
+            {this.orders()}
+            {this.activeDialog()}
         </View>
     )
+}
 
-    function activeDialog() {
+     activeDialog=()=> {
         return (
-            <Dialog.Container visible={showActiveDialog}
+            <Dialog.Container visible={this.props.showorder}
                 contentStyle={styles.dialogContainerStyle}
                 headerStyle={{ margin: 0.0, padding: 0.0, }}
             >
@@ -64,15 +53,14 @@ const ActiveOrders = ({ navigation }) => {
                     height: height - 150,
                     borderRadius: Sizes.fixPadding
                 }}>
-                    {orderId()}
+                    {this.orderId()}
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                     >
-                        {orderDetail()}
-                        {locationDetail()}
-                        {customerDetail()}
-                        {paymentDetail()}
-                        {startButton()}
+                        {this.orderDetail()}
+                      
+                        {this.startButton()}
+
                     </ScrollView>
 
                 </View>
@@ -80,151 +68,36 @@ const ActiveOrders = ({ navigation }) => {
         )
     }
 
-    function startButton() {
+   startButton=() =>{
         return (
             <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => {
-                    setShowActiveDialog(false);
-                    navigation.navigate('ShowMap')
+                    this.props.closeorderdialog()
+                    //this.props.navigation.navigate('ShowMap')
                 }}
                 style={styles.startButtonStyle}>
                 <Text style={{ ...Fonts.whiteColor18Medium }}>
-                    Start
+            Close
                 </Text>
             </TouchableOpacity>
         )
     }
 
-    function paymentDetail() {
-        return (
-            <View style={styles.detailWrapStyle}>
-                <View style={styles.detailHeaderWrapStyle}>
-                    <Text style={{ ...Fonts.blackColor17Medium }}>
-                        Payment
-                    </Text>
-                </View>
-                <View style={styles.detailDescriptionWrapStyle}>
-                    <View style={{ ...styles.detailSpecificWrapStyle }}>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            Payment
-                        </Text>
-                        <Text style={{ ...Fonts.blackColor15Medium, }}>
-                            Pay on Delivery
-                        </Text>
-                    </View>
-                </View>
-            </View>
-        )
-    }
+ 
 
-    function customerDetail() {
+   orderDetail=()=> {
         return (
             <View style={styles.detailWrapStyle}>
                 <View style={styles.detailHeaderWrapStyle}>
                     <Text style={{ ...Fonts.blackColor17Medium }}>
-                        Customer
-                    </Text>
-                </View>
-                <View style={styles.detailDescriptionWrapStyle}>
-                    <View style={{ ...styles.detailSpecificWrapStyle }}>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            Name
-                        </Text>
-                        <Text style={{ ...Fonts.blackColor15Medium, }}>
-                            Allison Perry
-                        </Text>
-                    </View>
-                    <View style={{ ...styles.detailSpecificWrapStyle }}>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            Phone
-                        </Text>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            123456789
-                        </Text>
-                    </View>
-                </View>
-            </View>
-        )
-    }
-
-    function locationDetail() {
-        return (
-            <View style={styles.detailWrapStyle}>
-                <View style={styles.detailHeaderWrapStyle}>
-                    <Text style={{ ...Fonts.blackColor17Medium }}>
-                        Location
-                    </Text>
-                </View>
-                <View style={styles.detailDescriptionWrapStyle}>
-                    <View style={{ ...styles.detailSpecificWrapStyle, justifyContent: 'flex-start' }}>
-                        <Text style={{ ...Fonts.blackColor15Medium, width: width / 2.6, }}>
-                            Pickup Location
-                        </Text>
-                        <Text style={{ ...Fonts.blackColor15Medium, }}>
-                            28 Mott Stret
-                        </Text>
-                    </View>
-                    <View style={{ ...styles.detailSpecificWrapStyle, justifyContent: 'flex-start' }}>
-                        <Text style={{ ...Fonts.blackColor15Medium, width: width / 2.6 }}>
-                            Delivery Location
-                        </Text>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            56 Andheri East
-                        </Text>
-                    </View>
-                </View>
-            </View>
-        )
-    }
-
-    function orderDetail() {
-        return (
-            <View style={styles.detailWrapStyle}>
-                <View style={styles.detailHeaderWrapStyle}>
-                    <Text style={{ ...Fonts.blackColor17Medium }}>
-                        Order
+                        Order Details
                     </Text>
                 </View>
                 <View style={styles.detailDescriptionWrapStyle}>
                     <View style={styles.detailSpecificWrapStyle}>
                         <Text style={{ ...Fonts.blackColor15Medium }}>
-                            Deal 1
-                        </Text>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            $430
-                        </Text>
-                    </View>
-                    <View style={styles.detailSpecificWrapStyle}>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            7up Regular 250ml
-                        </Text>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            $80
-                        </Text>
-                    </View>
-                    <View style={styles.detailSpecificWrapStyle}>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>Delivery Charges
-                        </Text>
-                        <Text style={{ ...Fonts.blackColor15Medium }}>
-                            $10
-                        </Text>
-                    </View>
-                    <View style={{
-                        height: 0.50,
-                        backgroundColor: Colors.lightGrayColor,
-                        marginBottom: Sizes.fixPadding - 5.0
-                    }} />
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                    }}>
-                        <Text style={{ ...Fonts.blackColor18Medium }}>
-                            Total
-                        </Text>
-                        <Text style={{ ...Fonts.primaryColor18Bold }}>
-                            $520
+                            {this.props.activeorder.details}
                         </Text>
                     </View>
                 </View>
@@ -232,48 +105,53 @@ const ActiveOrders = ({ navigation }) => {
         )
     }
 
-    function orderId() {
+   orderId=()=> {
         return (
             <View style={styles.detailTitleWrapStyle}>
                 <Text style={{ ...Fonts.whiteColor17Regular }}>
-                    OID123456789
+                    {this.props.activeorder.id}
                 </Text>
             </View>
         )
     }
 
-    function orders() {
+    orders=()=> {
 
         const renderItem = ({ item }) => (
-            <TouchableOpacity
+            <View
                 activeOpacity={0.9}
-                onPress={() => setShowActiveDialog(true)}
+               
                 style={styles.orderDetailWrapStyle}>
                 <View style={styles.orderAndPaymentDetailWrapStyle}>
                     <View style={{ flexDirection: 'row' }}>
-                        <MaterialIcons name="fastfood" size={29} color={Colors.primaryColor} />
+                        {/* <MaterialIcons name="fastfood" size={29} color={Colors.primaryColor} /> */}
                         <View style={{ marginLeft: Sizes.fixPadding }}>
                             <Text style={{ ...Fonts.blackColor18Medium }}>
                                 {item.orderId}
                             </Text>
-                            <View style={{ marginTop: Sizes.fixPadding + 10.0 }}>
-                                <Text style={{ ...Fonts.grayColor16Medium }}>
-                                    Payment Mode
-                                </Text>
-                                <Text style={{ ...Fonts.blackColor18Medium }}>
-                                    {item.paymentMethod}
-                                </Text>
+                            <View style={{ marginTop: Sizes.fixPadding + 2.0,flexDirection:'row' }}>
+                            <TouchableOpacity style={styles.buttons} onPress={()=>Linking.openURL(`tel:${this.props.activeorder.recipient_phone}`)}>
+                            <MaterialIcons name="add-call" size={29} color={Colors.primaryColor} /></TouchableOpacity>
+                            <TouchableOpacity style={styles.buttons}  onPress={() => this.props.showorderdialog(item)}>
+                            <MaterialCommunityIcons  name="clipboard-text" size={27} color={Colors.primaryColor} />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.buttons} onPress={()=>Linking.openURL(`tel:${this.props.activeorder.partner?.phone}`)}>
+                            <MaterialIcons name="add-call" size={29} color={Colors.primaryColor} /></TouchableOpacity>
+
+                            <TouchableOpacity style={styles.buttons} onPress={()=>this.completeorder(item)}>
+                            {this.props.loader === true ? <ActivityIndicator size="large" color="#00ff00" /> : <MaterialIcons name="check" size={29} color={Colors.primaryColor} />}
+                            </TouchableOpacity>
                             </View>
                         </View>
                     </View>
 
-                    <View style={{ marginBottom: Sizes.fixPadding - 9.0 }}>
+                    <View style={{ marginBottom: Sizes.fixPadding - 9.0,right:'60%' }}>
                         <Text style={{ ...Fonts.grayColor16Medium }}>
-                            Payment
+                           Del OTP: {item.del_otp}
                         </Text>
-                        <Text style={{ ...Fonts.blackColor18Medium }}>
-                            {`$ ${item.payableAmount.toFixed(2)}`}
-                        </Text>
+                        {/* <Text style={{ ...Fonts.blackColor18Medium }}>
+                            {`$ ${item.money}`}
+                        </Text> */}
                     </View>
 
                 </View>
@@ -283,7 +161,7 @@ const ActiveOrders = ({ navigation }) => {
                         ...Fonts.blackColor16Medium,
                         flex: 0.31,
                     }}>
-                        {item.pickupAddress}
+                        {item.from}
                     </Text>
                     <View style={{
                         flexDirection: 'row',
@@ -306,15 +184,15 @@ const ActiveOrders = ({ navigation }) => {
                         ...Fonts.blackColor16Medium,
                         flex: 0.31,
                     }}>
-                        {item.deliveryAddress}
+                        {item.to}
                     </Text>
                 </View>
-            </TouchableOpacity>
+            </View>
         )
 
         return (
             <FlatList
-                data={activeOrdersList}
+                data={this.props.orders}
                 keyExtractor={(item) => `${item.id}`}
                 renderItem={renderItem}
                 showsVerticalScrollIndicator={false}
@@ -328,6 +206,10 @@ const ActiveOrders = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
+    buttons:{
+        margin:15,
+
+    },
     dotStyle: {
         height: 5.0, width: 5.0,
         borderRadius: 2.5,
@@ -406,4 +288,14 @@ const styles = StyleSheet.create({
     }
 })
 
-export default ActiveOrders;
+function mapStateToProps( state ) {
+    return { 
+        orders:state.order.activeorders || [],
+        showorder:state.order.showorder,
+        activeorder:state.order.activeorder,
+        loader:state.order.loader,
+        orderdetails:state.order.orderdetails
+    };
+  }
+  
+  export default connect(mapStateToProps, actions)(ActiveOrders);
