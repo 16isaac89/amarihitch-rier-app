@@ -14,7 +14,7 @@ import InviteFriendsScreen from '../screens/inviteFriend/inviteFriendsScreen';
 import { connect } from 'react-redux';
 import * as actions from '../redux/actions';
 import RegisterScreen from '../screens/auth/RegisterScreen';
-
+import editPassword from '../screens/editProfile/editPassword'
 
 
 const Stack = createStackNavigator();
@@ -46,6 +46,7 @@ class MainNavigator extends Component {
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen name="ShowMap" component={ShowMapScreen} />
         <Stack.Screen name="InviteFriends" component={InviteFriendsScreen} />
+        <Stack.Screen name="editPassword" component={editPassword} />
         </>
         )
   }

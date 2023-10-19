@@ -28,3 +28,7 @@ export const CLOSE_ORDER_DIALOG = 'close_order_dialog'
 export const ORDER_COMPLETED = 'order_completed'
 
 export const WALLET_BALANCE = 'wallet_balance'
+
+export const OLD_PASSWORD = 'old_password'
+export const PLAIN_TEXT_PASSSWORD = 'plain_text_password'
+

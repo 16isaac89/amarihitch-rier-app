@@ -1,80 +1,49 @@
-import React, { useState } from "react";
+import React, { Component } from "react";
 import { Text, View, StyleSheet, SafeAreaView, StatusBar, ScrollView, TouchableOpacity, Image, Dimensions, } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constant/styles";
-import  MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import  AntDesign from 'react-native-vector-icons/AntDesign';
-
-import Dialog from "react-native-dialog";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import { Dialog } from "react-native-paper";
+import { connect } from 'react-redux';
+import * as actions from '../../redux/actions';
 
 const { width } = Dimensions.get('screen');
 
-const ProfileScreen = ({ navigation }) => {
+class profileScreen extends Component {
 
-    const [logoutDialog, setLogoutDialog] = useState(false);
-
+    render(){
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
             <View style={{ flex: 1 }}>
-                {header()}
-                {userInfo()}
+                {this.header()}
+                {this.userInfo()}
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     style={{ flex: 1, backgroundColor: '#F4F4F4' }}>
-                    {settingsInfo()}
-                    {logOutInfo()}
+                    {/* {this.settingsInfo()} */}
+                    {this.logOutInfo()}
                 </ScrollView>
             </View>
-            {logoutDialogInfo()}
+           
         </SafeAreaView>
     )
-
-    function logoutDialogInfo() {
-        return (
-            <Dialog.Container
-                visible={logoutDialog}
-                contentStyle={styles.dialogContainerStyle}
-            >
-                <View style={{ backgroundColor: 'white', alignItems: 'center', }}>
-                    <Text style={{ ...Fonts.blackColor19Medium, paddingBottom: Sizes.fixPadding - 5.0, }}>
-                        You sure want to logout?
-                    </Text>
-                    <View style={styles.cancelAndLogoutButtonWrapStyle}>
-                        <TouchableOpacity
-                            activeOpacity={0.6}
-                            onPress={() => setLogoutDialog(false)}
-                            style={styles.cancelButtonStyle}
-                        >
-                            <Text style={{ ...Fonts.blackColor18Medium }}>Cancel</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={0.6}
-                            onPress={() => {
-                                setLogoutDialog(false)
-                                navigation.push('Signin')
-                            }}
-                            style={styles.logOutButtonStyle}
-                        >
-                            <Text style={{ ...Fonts.whiteColor18Medium }}>Log out</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Dialog.Container>
-        )
     }
 
-    function logOutInfo() {
+
+
+    logOutInfo=()=> {
         return (
             <TouchableOpacity
                 activeOpacity={0.6}
-                onPress={() => setLogoutDialog(true)}
-                style={styles.logOutInfoWrapStyle}
-            >
+                onPress={() => this.props.logout()}
+                style={styles.logOutInfoWrapStyle}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <MaterialCommunityIcons name="login-variant" size={27} color={Colors.grayColor} />
+                    <MaterialCommunityIcons name="login-variant" size={24} color={Colors.grayColor} />
                     <Text style={{
-                        ...Fonts.blackColor16Medium,
-                        marginLeft: Sizes.fixPadding + 5.0,
+                        ...Fonts.blackColor17Regular,
+                        marginLeft: Sizes.fixPadding,
                         width: width / 1.8,
                     }}>
                         Logout
@@ -85,51 +54,41 @@ const ProfileScreen = ({ navigation }) => {
         )
     }
 
-    function settingsInfo() {
+   settingsInfo=()=> {
         return (
             <View style={styles.settingInfoWrapStyle}>
                 <TouchableOpacity
                     activeOpacity={0.6}
-                    onPress={() => navigation.navigate('Notifications')}
+                    onPress={() => navigation.navigate('Notifications', { from: 'profile' })}
                 >
-                    {settings({
-                        icon: <MaterialIcons name="notifications" size={25} color={Colors.grayColor} />,
-                        setting: 'Notifications'
-                    })}
+                   
+                        <MaterialIcons name="notifications" size={22} color={Colors.grayColor} />
+                       
                 </TouchableOpacity>
-                {settings({
-                    icon: <AntDesign name="earth" size={23} color={Colors.grayColor} />,
-                    setting: 'Language'
-                })}
-                {settings({
-                    icon: <MaterialIcons name="settings" size={25} color={Colors.grayColor} />,
-                    setting: 'Settings'
-                })}
+                
+                   
+                <MaterialIcons name="settings" size={22} color={Colors.grayColor} />
+                   
                 <TouchableOpacity
                     activeOpacity={0.6}
-                    onPress={() => { navigation.push('InviteFriends') }}
+                    onPress={() => navigation.push('InviteFriends')}
                 >
-                    {settings({
-                        icon: <MaterialIcons name="group-add" size={27} color={Colors.grayColor} />,
-                        setting: 'Invite Friends'
-                    })}
+                    <MaterialIcons name="group-add" size={24} color={Colors.grayColor} />
+                        
                 </TouchableOpacity>
-                {settings({
-                    icon: <MaterialIcons name="headset-mic" size={25} color={Colors.grayColor} />,
-                    setting: 'Support'
-                })}
+               
             </View>
         )
     }
 
-    function settings({ icon, setting }) {
+   settings=({ icon, setting })=> {
         return (
             <View style={styles.settingStyle}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     {icon}
                     <Text style={{
-                        ...Fonts.blackColor16Medium,
-                        marginLeft: Sizes.fixPadding + 5.0,
+                        ...Fonts.blackColor17Regular,
+                        marginLeft: Sizes.fixPadding,
                         width: width / 1.8,
                     }}>
                         {setting}
@@ -140,15 +99,15 @@ const ProfileScreen = ({ navigation }) => {
         )
     }
 
-    function userInfo() {
+    userInfo=() =>{
         return (
             <TouchableOpacity
                 activeOpacity={0.6}
-                onPress={() => navigation.navigate('EditProfile')}
+                onPress={() =>this.props.navigation.navigate('EditProfile')}
                 style={styles.userInfoWrapStyle}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image
-                        source={require('../../assets/images/delivery_boy.jpg')}
+                        source={require('../../assets/images/user.png')}
                         style={{
                             width: 80.0, height: 80.0,
                             borderRadius: Sizes.fixPadding - 5.0,
@@ -157,13 +116,13 @@ const ProfileScreen = ({ navigation }) => {
                     />
                     <View style={styles.userInfoStyle}>
                         <Text style={{
-                            ...Fonts.blackColor19Medium,
+                            ...Fonts.blackColor17Medium,
                             width: width / 2.3,
                         }}>
-                            John Doe
+                            {this.props.user.name}
                         </Text>
                         <Text style={{ ...Fonts.grayColor16Medium }}>
-                            123456789
+                        {this.props.user.phone || ''}
                         </Text>
                     </View>
                 </View>
@@ -172,10 +131,10 @@ const ProfileScreen = ({ navigation }) => {
         )
     }
 
-    function header() {
+    header=()=> {
         return (
             <Text style={{
-                ...Fonts.blackColor22Medium,
+                ...Fonts.blackColor20Medium,
                 paddingHorizontal: Sizes.fixPadding * 2.0,
                 paddingVertical: Sizes.fixPadding * 2.0,
             }}>
@@ -234,8 +193,8 @@ const styles = StyleSheet.create({
         width: width - 90,
         alignSelf: 'center',
         paddingHorizontal: Sizes.fixPadding * 3.0,
-        paddingTop: -Sizes.fixPadding,
-        paddingBottom: Sizes.fixPadding * 2.0
+        paddingBottom: Sizes.fixPadding * 2.0,
+        backgroundColor: Colors.whiteColor
     },
     cancelButtonStyle: {
         flex: 0.50,
@@ -263,4 +222,11 @@ const styles = StyleSheet.create({
     }
 })
 
-export default ProfileScreen;
+function mapStateToProps( state ) {
+    return { 
+     user:state.auth.user
+  
+    };
+  }
+  
+  export default connect(mapStateToProps, actions)(profileScreen);

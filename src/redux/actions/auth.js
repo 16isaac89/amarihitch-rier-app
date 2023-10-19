@@ -14,7 +14,8 @@ import {
    C_PASSWORD_CHANGED,
    SECOND_NAME,
    TOKEN_SENT,
-   WALLET_BALANCE
+   WALLET_BALANCE,
+   OLD_PASSWORD
  } from '../actions/types';
  import axios from "axios"
  import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -219,3 +220,9 @@ export const sendfcmtoken=() =>{
         }
     } 
   }
+
+  export const oldpasswordChanged = (text) =>{
+    return async(dispatch)=>{
+dispatch({type:OLD_PASSWORD,payload:text})
+    }
+}

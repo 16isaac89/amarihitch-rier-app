@@ -312,7 +312,7 @@ userInfo=() =>{
             <View style={styles.userInfoWrapStyle}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: Sizes.fixPadding }}>
                     <Image
-                        source={require('../../assets/images/user.jpg')}
+                        source={require('../../assets/images/user.png')}
                         style={{ height: 80.0, width: 80.0, borderRadius: 40.0, }}
                         resizeMode="cover"
                     />
